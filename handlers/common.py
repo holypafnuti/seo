@@ -150,6 +150,7 @@ def status_handler(message):
             "💡 Инфоповоды",
             "💬 Отправить переписку",
             "❓ Задать вопрос менеджера",
+            "❓ FAQ для сайта",
             "◀️ Назад",
         }
         and message.from_user.id not in waiting_for_info
