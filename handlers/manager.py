@@ -65,13 +65,9 @@ def manager_question_handler(message):
     bot.send_message(
         message.chat.id,
         "❓ Задай свой вопрос.\n\n"
-        "Например:\n"
-        "— Клиент говорит что дорого, как ответить?\n"
-        "— Как убедить взять люстру побольше?\n"
-        "— Клиент молчит после цены, что делать?",
+        "Обрати внимание, что на многие вопросы уже есть ответ в разделе "Памятка" и "Быстрые скрипты.\n""
         reply_markup=get_manager_keyboard()
     )
-
 
 @bot.message_handler(func=lambda m: m.from_user.id in waiting_for_manager_chat)
 def process_manager_chat(message):
