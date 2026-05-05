@@ -122,7 +122,12 @@ def handle_photo(message):
     except Exception as e:
         error_text = str(e)
         print(f"ОШИБКА В handle_photo: {error_text}")
-        if "RESOURCE_EXHAUSTED" in error_text or "429" in error_text:
-            bot.reply_to(message, "⚠️ Лимит запросов к AI временно исчерпан.\nПопробуй чуть позже.")
+
+        if "503" in error_text or "UNAVAILABLE" in error_text or "high demand" in error_text:
+            bot.reply_to(message, "⏳ Нейросеть сейчас перегружена — слишком много запросов. Подожди 1-2 минуты и попробуй снова.")
+        elif "RESOURCE_EXHAUSTED" in error_text or "429" in error_text:
+            bot.reply_to(message, "⏳ Лимит запросов к нейросети временно исчерпан. Попробуй через пару минут.")
+        elif "Все провайдеры" in error_text:
+            bot.reply_to(message, "⚠️ Все нейросети для обработки фото сейчас недоступны. Попробуй позже.")
         else:
-            bot.reply_to(message, "⚠️ Произошла ошибка при обработке фото.")
+            bot.reply_to(message, "⚠️ Что-то пошло не так при обработке фото. Попробуй ещё раз.")
