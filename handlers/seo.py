@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from config import bot, TELEGRAM_TOKEN
 from prompts import PROMPTS
 from bot_ui.states import user_styles, user_info, waiting_for_link
-from bot_ui.keyboards import get_seo_keyboard, get_smm_keyboard, get_translate_inline_keyboard
+from bot_ui.keyboards import get_seo_keyboard, get_smm_keyboard
 from storage.user_store import save_user, check_limit, increment_count
 from utils.formatting import format_text, send_long_message
 from ai.router import generate_text, generate_multimodal
