@@ -38,6 +38,10 @@ def price_handler(message):
     user_styles[message.from_user.id] = "price_analysis"
     bot.send_message(message.chat.id, "💰 Режим: <b>Анализ цен</b>. Отправь фото товара.", parse_mode="HTML")
 
+@bot.message_handler(func=lambda m: m.text == "❓ FAQ для сайта")
+def faq_handler(message):
+    user_styles[message.from_user.id] = "faq"
+    bot.send_message(message.chat.id, "❓ Режим: <b>FAQ для сайта</b>. Отправь фото товара.", parse_mode="HTML")
 
 @bot.message_handler(func=lambda m: m.from_user.id in waiting_for_link)
 def process_rewrite(message):
