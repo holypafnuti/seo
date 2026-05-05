@@ -38,7 +38,15 @@ def get_manager_keyboard():
     kb.add(KeyboardButton("❓ Задать вопрос менеджера"))
     kb.add(KeyboardButton("◀️ Назад"))
     return kb
-
+    
+def get_seo_keyboard():
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb.add(KeyboardButton("🎨 Выбрать стиль"), KeyboardButton("📋 Свои хар-ки"))
+    kb.add(KeyboardButton("📍 Собрать ключи"), KeyboardButton("🏷 Мета-теги (T/D)"))
+    kb.add(KeyboardButton("✌️ Рерайт по ссылке"), KeyboardButton("💰 Анализ цен"))
+    kb.add(KeyboardButton("❓ FAQ для сайта"))  # ← новая кнопка
+    kb.add(KeyboardButton("◀️ Назад"))
+    return kb
 
 def get_style_inline_keyboard():
     kb = InlineKeyboardMarkup()
