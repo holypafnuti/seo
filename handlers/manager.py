@@ -2,8 +2,9 @@ import requests
 
 from config import bot, TELEGRAM_TOKEN
 from prompts import PROMPTS
+from scripts import SCRIPTS
 from bot_ui.states import waiting_for_manager_chat, waiting_for_manager_question
-from bot_ui.keyboards import get_manager_keyboard, get_main_keyboard
+from bot_ui.keyboards import get_manager_keyboard, get_main_keyboard, get_scripts_inline_keyboard
 from storage.user_store import check_limit, increment_count
 from utils.formatting import format_text, send_long_message
 from ai.router import generate_text, generate_multimodal
@@ -14,8 +15,33 @@ def manager_menu(message):
     bot.send_message(
         message.chat.id,
         "🧠 <b>Помощник менеджера</b>\n\n"
-        "Я помогу выстроить диалог с клиентом — проанализирую переписку и дам конкретные советы что и как сказать.\n\n"
         "Выбери режим:",
+        parse_mode="HTML",
+        reply_markup=get_manager_keyboard()
+    )
+
+
+@bot.message_handler(func=lambda m: m.text == "⚡ Быстрые скрипты")
+def quick_scripts_handler(message):
+    bot.send_message(
+        message.chat.id,
+        "⚡ <b>Быстрые скрипты</b>\n\nВыбери ситуацию — получишь готовый скрипт ответа:",
+        parse_mode="HTML",
+        reply_markup=get_scripts_inline_keyboard()
+    )
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("script_"))
+def handle_script_callback(call):
+    script = SCRIPTS.get(call.data)
+    if not script:
+        bot.answer_callback_query(call.id, "Скрипт не найден")
+        return
+
+    bot.answer_callback_query(call.id)
+    bot.send_message(
+        call.message.chat.id,
+        format_text(script),
         parse_mode="HTML",
         reply_markup=get_manager_keyboard()
     )
@@ -49,15 +75,16 @@ def manager_question_handler(message):
 
 @bot.message_handler(func=lambda m: m.from_user.id in waiting_for_manager_chat)
 def process_manager_chat(message):
-    if message.text in ["◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку", "❓ Задать вопрос менеджера"]:
+    if message.text in ["◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку", "❓ Задать вопрос менеджера", "⚡ Быстрые скрипты"]:
         waiting_for_manager_chat.discard(message.from_user.id)
         if message.text == "◀️ Назад":
             bot.send_message(message.chat.id, "Главное меню", reply_markup=get_main_keyboard())
         elif message.text == "🧠 Помощник менеджера":
             manager_menu(message)
         elif message.text == "❓ Задать вопрос менеджера":
-            waiting_for_manager_chat.discard(message.from_user.id)
             manager_question_handler(message)
+        elif message.text == "⚡ Быстрые скрипты":
+            quick_scripts_handler(message)
         return
 
     if not check_limit(message):
@@ -100,6 +127,7 @@ def process_manager_chat_photo(message):
         prompt = (
             PROMPTS["manager_help"]
             + "\n\nПЕРЕПИСКА (скриншот): прочитай текст с изображения и разбери переписку."
+            + "\nВАЖНО: сообщения СПРАВА — менеджер (наша сторона), сообщения СЛЕВА — клиент."
         )
         result = generate_multimodal(prompt, img_content)
         text = format_text(result)
@@ -118,15 +146,16 @@ def process_manager_chat_photo(message):
 
 @bot.message_handler(func=lambda m: m.from_user.id in waiting_for_manager_question)
 def process_manager_question(message):
-    if message.text in ["◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку", "❓ Задать вопрос менеджера"]:
+    if message.text in ["◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку", "❓ Задать вопрос менеджера", "⚡ Быстрые скрипты"]:
         waiting_for_manager_question.discard(message.from_user.id)
         if message.text == "◀️ Назад":
             bot.send_message(message.chat.id, "Главное меню", reply_markup=get_main_keyboard())
         elif message.text == "🧠 Помощник менеджера":
             manager_menu(message)
         elif message.text == "💬 Отправить переписку":
-            waiting_for_manager_question.discard(message.from_user.id)
             manager_chat_handler(message)
+        elif message.text == "⚡ Быстрые скрипты":
+            quick_scripts_handler(message)
         return
 
     if not check_limit(message):
