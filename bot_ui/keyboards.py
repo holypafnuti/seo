@@ -20,7 +20,7 @@ def get_seo_keyboard():
     kb.add(KeyboardButton("🎨 Выбрать стиль"), KeyboardButton("📋 Свои хар-ки"))
     kb.add(KeyboardButton("📍 Собрать ключи"), KeyboardButton("🏷 Мета-теги (T/D)"))
     kb.add(KeyboardButton("✌️ Рерайт по ссылке"), KeyboardButton("💰 Анализ цен"))
-    kb.add(KeyboardButton("❓ FAQ для сайта"))  # ← новая кнопка
+    kb.add(KeyboardButton("❓ FAQ для сайта"))
     kb.add(KeyboardButton("◀️ Назад"))
     return kb
 
@@ -37,8 +37,10 @@ def get_manager_keyboard():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     kb.add(KeyboardButton("💬 Отправить переписку"))
     kb.add(KeyboardButton("❓ Задать вопрос менеджера"))
+    kb.add(KeyboardButton("⚡ Быстрые скрипты"))
     kb.add(KeyboardButton("◀️ Назад"))
     return kb
+
 
 def get_style_inline_keyboard():
     kb = InlineKeyboardMarkup()
@@ -48,7 +50,14 @@ def get_style_inline_keyboard():
     return kb
 
 
-def get_translate_inline_keyboard():
-    kb = InlineKeyboardMarkup()
-    kb.add(InlineKeyboardButton("🇺🇸 Перевести на English", callback_data="translate_en"))
+def get_scripts_inline_keyboard():
+    kb = InlineKeyboardMarkup(row_width=1)
+    kb.add(
+        InlineKeyboardButton("💰 Дорого, я подумаю", callback_data="script_expensive"),
+        InlineKeyboardButton("🏪 Сравнивает с конкурентами", callback_data="script_competitors"),
+        InlineKeyboardButton("🤐 Молчит после цены", callback_data="script_silence"),
+        InlineKeyboardButton("🎁 Просит скидку", callback_data="script_discount"),
+        InlineKeyboardButton("❓ Сомневается в качестве", callback_data="script_quality"),
+        InlineKeyboardButton("📦 Товара нет в наличии", callback_data="script_nostock"),
+    )
     return kb
