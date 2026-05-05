@@ -1,3 +1,4 @@
+import base64
 from io import BytesIO
 
 import requests
@@ -102,10 +103,56 @@ def _gemini_multimodal(prompt: str, image_bytes: bytes) -> str:
     return getattr(result, "text", "") or ""
 
 
+def _groq_multimodal(prompt: str, image_bytes: bytes) -> str:
+    if not GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY не задан")
+
+    img = Image.open(BytesIO(image_bytes))
+    img.load()
+    if img.mode not in ("RGB", "RGBA"):
+        img = img.convert("RGB")
+    max_size = 1280
+    if img.width > max_size or img.height > max_size:
+        img.thumbnail((max_size, max_size))
+
+    buffer = BytesIO()
+    img.save(buffer, format="JPEG", quality=85)
+    image_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    payload = {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{image_b64}"
+                        }
+                    },
+                    {
+                        "type": "text",
+                        "text": prompt
+                    }
+                ]
+            }
+        ],
+        "temperature": 0.4,
+    }
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    response = requests.post(GROQ_URL, json=payload, headers=headers, timeout=60)
+    response.raise_for_status()
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
+
+
 def generate_text(prompt: str) -> str:
     """
     Порядок: DeepSeek → Groq → OpenRouter → Gemini
-    Используется для всех текстовых задач (посты, SEO, менеджер).
     """
     providers = []
     if DEEPSEEK_API_KEY:
@@ -137,9 +184,24 @@ def generate_text(prompt: str) -> str:
 
 def generate_multimodal(prompt: str, image_bytes: bytes) -> str:
     """
-    Фото всегда через Gemini — он лучший для мультимодала.
-    Если Gemini недоступен — fallback на текст без фото.
+    Фото: Gemini → Groq Llama 4 → ошибка
     """
     if GEMINI_API_KEY:
-        return _gemini_multimodal(prompt, image_bytes)
-    return generate_text(prompt + "\n\n[Фото не обработано: Gemini не настроен]")
+        try:
+            result = _gemini_multimodal(prompt, image_bytes)
+            if result:
+                print("[router] Фото обработано через Gemini")
+                return result
+        except Exception as e:
+            print(f"[router] Gemini недоступен для фото: {e}")
+
+    if GROQ_API_KEY:
+        try:
+            result = _groq_multimodal(prompt, image_bytes)
+            if result:
+                print("[router] Фото обработано через Groq Llama 4")
+                return result
+        except Exception as e:
+            print(f"[router] Groq недоступен для фото: {e}")
+
+    raise RuntimeError("Все провайдеры для обработки фото недоступны")
