@@ -11,7 +11,7 @@ def format_text(text: str) -> str:
             result += f"<b>{part}</b>"
         else:
             result += part
-    result = result.replace("*", "").replace("###", "").replace("##", "")
+    result = result.replace("*", "").replace("###", "").replace("##", "").replace("$", "")
     return result
 
 
