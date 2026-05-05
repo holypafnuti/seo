@@ -104,14 +104,12 @@ def handle_photo(message):
             bot.send_message(
                 message.chat.id,
                 "⬆️ Текст отправлен частями.",
-                reply_markup=get_translate_inline_keyboard()
             )
         else:
             bot.send_message(
                 message.chat.id,
                 text,
                 parse_mode="HTML",
-                reply_markup=get_translate_inline_keyboard()
             )
 
         if style in ["smm_reels", "smm_stories", "smm_ideas", "social"]:
