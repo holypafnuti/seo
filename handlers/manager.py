@@ -94,7 +94,7 @@ def manager_question_handler(message):
     bot.send_message(
         message.chat.id,
         "❓ Задай свой вопрос.\n\n"
-        "— Обрати внимание, многие ответы уже есть в разделе "Быстрые скрипты" и "Справочник".\n",
+        '— Обрати внимание, многие ответы уже есть в разделе "Быстрые скрипты" и "Справочник".\n',
         reply_markup=get_manager_keyboard()
     )
 
