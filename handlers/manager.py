@@ -3,8 +3,14 @@ import requests
 from config import bot, TELEGRAM_TOKEN
 from prompts import PROMPTS
 from scripts import SCRIPTS
+from handbook import HANDBOOK
 from bot_ui.states import waiting_for_manager_chat, waiting_for_manager_question
-from bot_ui.keyboards import get_manager_keyboard, get_main_keyboard, get_scripts_inline_keyboard
+from bot_ui.keyboards import (
+    get_manager_keyboard,
+    get_main_keyboard,
+    get_scripts_inline_keyboard,
+    get_handbook_inline_keyboard,
+)
 from storage.user_store import check_limit, increment_count
 from utils.formatting import format_text, send_long_message
 from ai.router import generate_text, generate_multimodal
@@ -14,8 +20,7 @@ from ai.router import generate_text, generate_multimodal
 def manager_menu(message):
     bot.send_message(
         message.chat.id,
-        "🧠 <b>Помощник менеджера</b>\n\n"
-        "Выбери режим:",
+        "🧠 <b>Помощник менеджера</b>\n\nВыбери режим:",
         parse_mode="HTML",
         reply_markup=get_manager_keyboard()
     )
@@ -31,17 +36,41 @@ def quick_scripts_handler(message):
     )
 
 
+@bot.message_handler(func=lambda m: m.text == "📚 Справочник")
+def handbook_handler(message):
+    bot.send_message(
+        message.chat.id,
+        "📚 <b>Справочник менеджера</b>\n\nВыбери нужный раздел:",
+        parse_mode="HTML",
+        reply_markup=get_handbook_inline_keyboard()
+    )
+
+
 @bot.callback_query_handler(func=lambda call: call.data.startswith("script_"))
 def handle_script_callback(call):
     script = SCRIPTS.get(call.data)
     if not script:
         bot.answer_callback_query(call.id, "Скрипт не найден")
         return
-
     bot.answer_callback_query(call.id)
     bot.send_message(
         call.message.chat.id,
         format_text(script),
+        parse_mode="HTML",
+        reply_markup=get_manager_keyboard()
+    )
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("hb_"))
+def handle_handbook_callback(call):
+    entry = HANDBOOK.get(call.data)
+    if not entry:
+        bot.answer_callback_query(call.id, "Раздел не найден")
+        return
+    bot.answer_callback_query(call.id)
+    bot.send_message(
+        call.message.chat.id,
+        format_text(entry),
         parse_mode="HTML",
         reply_markup=get_manager_keyboard()
     )
@@ -59,28 +88,36 @@ def manager_chat_handler(message):
     )
 
 
-@bot.message_handler(func=lambda m: m.text == "❓ Задать вопрос менеджера")
+@bot.message_handler(func=lambda m: m.text == "❓ Задать вопрос")
 def manager_question_handler(message):
     waiting_for_manager_question.add(message.from_user.id)
     bot.send_message(
         message.chat.id,
         "❓ Задай свой вопрос.\n\n"
-        "Обрати внимание, что на многие вопросы уже есть ответ в разделе "Памятка" и "Быстрые скрипты".\n"
+        "Например:\n"
+        "— Клиент говорит что дорого, как ответить?\n"
+        "— Как убедить взять люстру побольше?\n"
+        "— Клиент молчит после цены, что делать?",
         reply_markup=get_manager_keyboard()
     )
 
+
 @bot.message_handler(func=lambda m: m.from_user.id in waiting_for_manager_chat)
 def process_manager_chat(message):
-    if message.text in ["◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку", "❓ Задать вопрос менеджера", "⚡ Быстрые скрипты"]:
+    nav_buttons = {"◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку",
+                   "❓ Задать вопрос", "⚡ Быстрые скрипты", "📚 Справочник"}
+    if message.text in nav_buttons:
         waiting_for_manager_chat.discard(message.from_user.id)
         if message.text == "◀️ Назад":
             bot.send_message(message.chat.id, "Главное меню", reply_markup=get_main_keyboard())
         elif message.text == "🧠 Помощник менеджера":
             manager_menu(message)
-        elif message.text == "❓ Задать вопрос менеджера":
+        elif message.text == "❓ Задать вопрос":
             manager_question_handler(message)
         elif message.text == "⚡ Быстрые скрипты":
             quick_scripts_handler(message)
+        elif message.text == "📚 Справочник":
+            handbook_handler(message)
         return
 
     if not check_limit(message):
@@ -142,7 +179,9 @@ def process_manager_chat_photo(message):
 
 @bot.message_handler(func=lambda m: m.from_user.id in waiting_for_manager_question)
 def process_manager_question(message):
-    if message.text in ["◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку", "❓ Задать вопрос менеджера", "⚡ Быстрые скрипты"]:
+    nav_buttons = {"◀️ Назад", "🧠 Помощник менеджера", "💬 Отправить переписку",
+                   "❓ Задать вопрос", "⚡ Быстрые скрипты", "📚 Справочник"}
+    if message.text in nav_buttons:
         waiting_for_manager_question.discard(message.from_user.id)
         if message.text == "◀️ Назад":
             bot.send_message(message.chat.id, "Главное меню", reply_markup=get_main_keyboard())
@@ -152,6 +191,8 @@ def process_manager_question(message):
             manager_chat_handler(message)
         elif message.text == "⚡ Быстрые скрипты":
             quick_scripts_handler(message)
+        elif message.text == "📚 Справочник":
+            handbook_handler(message)
         return
 
     if not check_limit(message):
@@ -161,10 +202,7 @@ def process_manager_question(message):
     bot.reply_to(message, "⏳ Думаю...")
 
     try:
-        prompt = (
-            PROMPTS["manager_help"]
-            + f"\n\nВОПРОС МЕНЕДЖЕРА:\n{message.text}"
-        )
+        prompt = PROMPTS["manager_help"] + f"\n\nВОПРОС МЕНЕДЖЕРА:\n{message.text}"
         result = generate_text(prompt)
         text = format_text(result)
         send_long_message(message.chat.id, text, reply_to=message)
