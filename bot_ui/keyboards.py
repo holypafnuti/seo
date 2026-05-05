@@ -35,9 +35,8 @@ def get_smm_keyboard():
 
 def get_manager_keyboard():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.add(KeyboardButton("💬 Отправить переписку"))
-    kb.add(KeyboardButton("❓ Задать вопрос менеджера"))
-    kb.add(KeyboardButton("⚡ Быстрые скрипты"))
+    kb.add(KeyboardButton("💬 Отправить переписку"), KeyboardButton("❓ Задать вопрос"))
+    kb.add(KeyboardButton("⚡ Быстрые скрипты"), KeyboardButton("📚 Справочник"))
     kb.add(KeyboardButton("◀️ Назад"))
     return kb
 
@@ -59,5 +58,18 @@ def get_scripts_inline_keyboard():
         InlineKeyboardButton("🎁 Просит скидку", callback_data="script_discount"),
         InlineKeyboardButton("❓ Сомневается в качестве", callback_data="script_quality"),
         InlineKeyboardButton("📦 Товара нет в наличии", callback_data="script_nostock"),
+    )
+    return kb
+
+
+def get_handbook_inline_keyboard():
+    kb = InlineKeyboardMarkup(row_width=1)
+    kb.add(
+        InlineKeyboardButton("📞 Скрипт первого звонка", callback_data="hb_first_call"),
+        InlineKeyboardButton("💳 Реквизиты для оплаты", callback_data="hb_payment"),
+        InlineKeyboardButton("🚚 Доставка и оплата", callback_data="hb_delivery"),
+        InlineKeyboardButton("🔍 Где искать товары", callback_data="hb_search"),
+        InlineKeyboardButton("❓ Ответы на частые вопросы", callback_data="hb_faq"),
+        InlineKeyboardButton("🔗 Полезные ссылки", callback_data="hb_links"),
     )
     return kb
