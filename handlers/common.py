@@ -23,22 +23,17 @@ from storage.user_store import save_user, get_count, is_premium, load_users, get
 @bot.message_handler(commands=["start"])
 def start(message):
     save_user(message.from_user)
-    count = get_count(message.from_user.id)
-    premium = is_premium(message.from_user.id)
-    status = "⭐ Премиум" if premium else f"Бесплатно: {count}/{FREE_LIMIT} генераций"
     bot.reply_to(
         message,
-        f"Привет! Я помогаю магазину люстр создавать контент и помогаю менеджерам продавать лучше.\n\n"
+        f"Привет! Я помогу тебе создавать контент и продавать больше.\n\n"
         f"📸 Отправь фото товара — напишу название и описание.\n"
         f"📋 <b>Свои хар-ки</b> — добавить характеристики вручную\n"
         f"🎨 <b>Стиль</b> — выбрать формат описания\n"
-        f"📱 <b>Пост по фото</b> — пост для соцсетей\n"
-        f"🧠 <b>Помощник менеджера</b> — советы по работе с клиентом\n\n"
-        f"Статус: {status}",
+        f"📱 <b>Поиск по фото</b> — найду товар в интернете\n"
+        f"🧠 <b>Помощник менеджера</b> — советы по работе с клиентами\n\n",
         parse_mode="HTML",
         reply_markup=get_main_keyboard()
     )
-
 
 @bot.message_handler(commands=["id"])
 def my_id(message):
