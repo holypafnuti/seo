@@ -77,7 +77,7 @@ def get_handbook_inline_keyboard():
 def get_search_lens_keyboard(file_url: str, query: str):
     """Кнопки поиска похожих товаров по фото и названию"""
     lens_url = f"https://lens.google.com/uploadbyurl?url={quote(file_url, safe='')}&q={quote('купить Донплафон Империум 33 идеи', safe='')}"
-    ya_lens = f"https://yandex.ru/images/search?rpt=imageview&url={quote(file_url, safe='')}"
+    ya_lens = f"https://yandex.ru/images/search?rpt=imageview&url={quote(file_url, safe='')}&q={quote('купить Донплафон Империум 33 идеи', safe='')}"
     q = quote(query, safe="")
     q_buy = quote(f"купить {query}", safe="")
 
