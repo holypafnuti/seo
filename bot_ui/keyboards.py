@@ -78,7 +78,7 @@ def get_handbook_inline_keyboard():
 
 def get_search_lens_keyboard(file_url: str, query: str):
     """Кнопки поиска похожих товаров по фото и названию"""
-    lens_url = f"https://lens.google.com/uploadbyurl?url={quote(file_url, safe='')}&q={quote('купить ' + query, safe='')}"
+    lens_url = f"https://lens.google.com/uploadbyurl?url={quote(file_url, safe='')}&q={quote('купить donplafon imperiumloft 33ideas', safe='')}"
     q = quote(query, safe="")
     q_buy = quote(f"купить {query}", safe="")
 
@@ -88,7 +88,7 @@ def get_search_lens_keyboard(file_url: str, query: str):
         InlineKeyboardButton("🛍 Донплафон", url=f"https://donplafon.ru/search/?q={q}"),
         InlineKeyboardButton("🛍 Империум", url=f"https://imperiumloft.ru/search/?q={q}"),
         InlineKeyboardButton("🛍 33 идеи", url=f"https://www.33ideas.ru/search/?q={q}"),
-        InlineKeyboardButton("🛍 Алиэкспресс", url=f"https://aliexpress.ru/wholesale?SearchText={q_buy}"),
+        InlineKeyboardButton("🛍 Алиэкспресс", url=f"https://aliexpress.ru/wholesale?SearchText={quote(query, safe='')}"),
         InlineKeyboardButton("🔎 Google — все магазины", url=f"https://www.google.com/search?q={quote(f'купить {query} donplafon OR imperiumloft OR 33ideas', safe='')}"),
     )
     return kb
