@@ -85,6 +85,7 @@ def get_search_lens_keyboard(file_url: str, query: str):
     kb.add(
         InlineKeyboardButton("🌐 Google — поиск по фото", url=lens_url),
         InlineKeyboardButton("🌐 Яндекс — поиск по фото", url=ya_lens),
+        InlineKeyboardButton("🔎 Яндекс — поиск по названию", url=f"https://yandex.ru/search/?text={quote('купить ' + query + ' Донплафон Империум 33идеи', safe='')}"),
         InlineKeyboardButton("🔎 Google — поиск по названию", url=f"https://www.google.com/search?q={quote(f'купить {query} Донплафон Империум 33идеи', safe='')}"),
     )
     return kb
