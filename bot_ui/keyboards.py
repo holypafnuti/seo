@@ -20,7 +20,7 @@ def get_seo_keyboard():
     kb.add(KeyboardButton("🎨 Выбрать стиль"), KeyboardButton("📋 Свои хар-ки"))
     kb.add(KeyboardButton("📍 Собрать ключи"), KeyboardButton("🏷 Мета-теги (T/D)"))
     kb.add(KeyboardButton("✌️ Рерайт по ссылке"), KeyboardButton("💰 Анализ цен"))
-    kb.add(KeyboardButton("❓ FAQ для сайта"), kb.add(KeyboardButton("◀️ Назад"))
+    kb.add(KeyboardButton("❓ FAQ для сайта"), KeyboardButton("◀️ Назад"))
     return kb
 
 
