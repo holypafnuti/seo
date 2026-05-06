@@ -9,7 +9,6 @@ from bot_ui.keyboards import get_seo_keyboard, get_smm_keyboard
 from storage.user_store import save_user, check_limit, increment_count
 from utils.formatting import format_text, send_long_message
 from ai.router import generate_text, generate_multimodal
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 def get_lens_keyboard(file_url: str):
@@ -115,14 +114,6 @@ def handle_photo(message):
             bot.send_message(message.chat.id, "⬆️ Текст отправлен частями.")
         else:
             bot.send_message(message.chat.id, text, parse_mode="HTML")
-
-        # Кнопка Google Lens для всех режимов кроме SMM
-        if style not in ["smm_reels", "smm_stories", "smm_ideas", "social"]:
-            bot.send_message(
-                message.chat.id,
-                "🔍 Найти похожие товары:",
-                reply_markup=get_lens_keyboard(file_url)
-            )
 
         if style in ["smm_reels", "smm_stories", "smm_ideas", "social"]:
             bot.send_message(message.chat.id, "📸 Готово! Можешь прислать ещё фото для SMM.", reply_markup=get_smm_keyboard())
