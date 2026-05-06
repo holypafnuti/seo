@@ -34,9 +34,9 @@ def get_smm_keyboard():
 
 def get_manager_keyboard():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.add(KeyboardButton("💬 Отправить переписку"), KeyboardButton("❓ Задать вопрос"))
+    kb.add(KeyboardButton("🔍 Найти похожие"), KeyboardButton("❓ Задай любой вопрос"))
     kb.add(KeyboardButton("⚡ Быстрые скрипты"), KeyboardButton("📚 Справочник"))
-    kb.add(KeyboardButton("🔍 Найти похожие"), KeyboardButton("◀️ Назад"))
+    kb.add(KeyboardButton("💬 Отправить переписку"), KeyboardButton("◀️ Назад"))
     return kb
 
 
@@ -77,12 +77,14 @@ def get_handbook_inline_keyboard():
 def get_search_lens_keyboard(file_url: str, query: str):
     """Кнопки поиска похожих товаров по фото и названию"""
     lens_url = f"https://lens.google.com/uploadbyurl?url={quote(file_url, safe='')}&q={quote('купить Донплафон Империум 33 идеи', safe='')}"
+    ya_lens = f"https://yandex.ru/images/search?rpt=imageview&url={quote(file_url, safe='')}"
     q = quote(query, safe="")
     q_buy = quote(f"купить {query}", safe="")
 
     kb = InlineKeyboardMarkup(row_width=1)
     kb.add(
-        InlineKeyboardButton("🌐 Google Lens — визуальный поиск", url=lens_url),
+        InlineKeyboardButton("🌐 Google — поиск по фото", url=lens_url),
+        InlineKeyboardButton("🌐 Яндекс — поиск по фото", url=ya_lens),
         InlineKeyboardButton("🔎 Google — поиск по названию", url=f"https://www.google.com/search?q={quote(f'купить {query} Донплафон Империум 33идеи', safe='')}"),
     )
     return kb
