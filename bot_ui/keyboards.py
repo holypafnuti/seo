@@ -1,3 +1,4 @@
+from urllib.parse import quote
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -37,7 +38,7 @@ def get_manager_keyboard():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     kb.add(KeyboardButton("💬 Отправить переписку"), KeyboardButton("❓ Задать вопрос"))
     kb.add(KeyboardButton("⚡ Быстрые скрипты"), KeyboardButton("📚 Справочник"))
-    kb.add(KeyboardButton("◀️ Назад"))
+    kb.add(KeyboardButton("🔍 Найти похожие"), KeyboardButton("◀️ Назад"))
     return kb
 
 
@@ -71,5 +72,23 @@ def get_handbook_inline_keyboard():
         InlineKeyboardButton("🔍 Где искать товары", callback_data="hb_search"),
         InlineKeyboardButton("❓ Ответы на частые вопросы", callback_data="hb_faq"),
         InlineKeyboardButton("🔗 Полезные ссылки", callback_data="hb_links"),
+    )
+    return kb
+
+
+def get_search_lens_keyboard(file_url: str, query: str):
+    """Кнопки поиска похожих товаров по фото и названию"""
+    lens_url = f"https://lens.google.com/uploadbyurl?url={quote(file_url, safe='')}&q={quote('купить ' + query, safe='')}"
+    q = quote(query, safe="")
+    q_buy = quote(f"купить {query}", safe="")
+
+    kb = InlineKeyboardMarkup(row_width=1)
+    kb.add(
+        InlineKeyboardButton("🌐 Google Lens — визуальный поиск", url=lens_url),
+        InlineKeyboardButton("🛍 Донплафон", url=f"https://donplafon.ru/search/?q={q}"),
+        InlineKeyboardButton("🛍 Империум", url=f"https://imperiumloft.ru/search/?q={q}"),
+        InlineKeyboardButton("🛍 33 идеи", url=f"https://www.33ideas.ru/search/?q={q}"),
+        InlineKeyboardButton("🛍 Алиэкспресс", url=f"https://aliexpress.ru/wholesale?SearchText={q_buy}"),
+        InlineKeyboardButton("🔎 Google — все магазины", url=f"https://www.google.com/search?q={quote(f'купить {query} donplafon OR imperiumloft OR 33ideas', safe='')}"),
     )
     return kb
