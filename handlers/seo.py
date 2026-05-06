@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import quote
 
 from config import bot, TELEGRAM_TOKEN
 from prompts import PROMPTS
@@ -8,6 +9,14 @@ from bot_ui.keyboards import get_seo_keyboard, get_smm_keyboard
 from storage.user_store import save_user, check_limit, increment_count
 from utils.formatting import format_text, send_long_message
 from ai.router import generate_text, generate_multimodal
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+
+def get_lens_keyboard(file_url: str):
+    lens_url = f"https://lens.google.com/uploadbyurl?url={quote(file_url, safe='')}&q=купить"
+    kb = InlineKeyboardMarkup()
+    kb.add(InlineKeyboardButton("🔍 Найти похожие в Google Lens", url=lens_url))
+    return kb
 
 
 @bot.message_handler(func=lambda m: m.text == "🚀 SEO инструменты")
@@ -38,10 +47,12 @@ def price_handler(message):
     user_styles[message.from_user.id] = "price_analysis"
     bot.send_message(message.chat.id, "💰 Режим: <b>Анализ цен</b>. Отправь фото товара.", parse_mode="HTML")
 
+
 @bot.message_handler(func=lambda m: m.text == "❓ FAQ для сайта")
 def faq_handler(message):
     user_styles[message.from_user.id] = "faq"
     bot.send_message(message.chat.id, "❓ Режим: <b>FAQ для сайта</b>. Отправь фото товара.", parse_mode="HTML")
+
 
 @bot.message_handler(func=lambda m: m.from_user.id in waiting_for_link)
 def process_rewrite(message):
@@ -62,11 +73,7 @@ def process_rewrite(message):
             s.extract()
 
         clean_text = " ".join(soup.get_text().split())[:3000]
-        prompt = (
-            f"Сделай уникальный SEO-рерайт описания люстры или светильника по этому тексту. "
-            f"Не перегружай текст, максимум 150 слов. "
-            f"Без спецсимволов и эмодзи: {clean_text}"
-        )
+        prompt = PROMPTS["rewrite"] + clean_text
         result = generate_text(prompt)
         send_long_message(message.chat.id, format_text(result))
     except Exception:
@@ -105,15 +112,16 @@ def handle_photo(message):
 
         if len(text) > 4000:
             send_long_message(message.chat.id, text)
-            bot.send_message(
-                message.chat.id,
-                "⬆️ Текст отправлен частями.",
-            )
+            bot.send_message(message.chat.id, "⬆️ Текст отправлен частями.")
         else:
+            bot.send_message(message.chat.id, text, parse_mode="HTML")
+
+        # Кнопка Google Lens для всех режимов кроме SMM
+        if style not in ["smm_reels", "smm_stories", "smm_ideas", "social"]:
             bot.send_message(
                 message.chat.id,
-                text,
-                parse_mode="HTML",
+                "🔍 Найти похожие товары:",
+                reply_markup=get_lens_keyboard(file_url)
             )
 
         if style in ["smm_reels", "smm_stories", "smm_ideas", "social"]:
