@@ -61,14 +61,4 @@ def is_premium(user_id):
 
 
 def check_limit(message):
-    if is_premium(message.from_user.id):
-        return True
-
-    if get_count(message.from_user.id) >= FREE_LIMIT:
-        bot.reply_to(
-            message,
-            f"❌ Бесплатный лимит {FREE_LIMIT} генераций исчерпан.\n\n"
-            "Для получения Премиума напишите @holy_pafnuti"
-        )
-        return False
     return True
