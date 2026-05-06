@@ -6,7 +6,6 @@ def get_main_keyboard():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     kb.add(KeyboardButton("🚀 SEO инструменты"), KeyboardButton("📱 SMM инструменты"))
     kb.add(KeyboardButton("🧠 Помощник менеджера"))
-    kb.add(KeyboardButton("👤 Мой статус"))
     return kb
 
 
@@ -21,8 +20,7 @@ def get_seo_keyboard():
     kb.add(KeyboardButton("🎨 Выбрать стиль"), KeyboardButton("📋 Свои хар-ки"))
     kb.add(KeyboardButton("📍 Собрать ключи"), KeyboardButton("🏷 Мета-теги (T/D)"))
     kb.add(KeyboardButton("✌️ Рерайт по ссылке"), KeyboardButton("💰 Анализ цен"))
-    kb.add(KeyboardButton("❓ FAQ для сайта"))
-    kb.add(KeyboardButton("◀️ Назад"))
+    kb.add(KeyboardButton("❓ FAQ для сайта")), kb.add(KeyboardButton("◀️ Назад"))
     return kb
 
 
