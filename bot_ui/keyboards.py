@@ -20,7 +20,7 @@ def get_seo_keyboard():
     kb.add(KeyboardButton("🎨 Выбрать стиль"), KeyboardButton("📋 Свои хар-ки"))
     kb.add(KeyboardButton("📍 Собрать ключи"), KeyboardButton("🏷 Мета-теги (T/D)"))
     kb.add(KeyboardButton("✌️ Рерайт по ссылке"), KeyboardButton("💰 Анализ цен"))
-    kb.add(KeyboardButton("❓ FAQ для сайта")), kb.add(KeyboardButton("◀️ Назад"))
+    kb.add(KeyboardButton("❓ FAQ для сайта"), kb.add(KeyboardButton("◀️ Назад"))
     return kb
 
 
@@ -83,10 +83,6 @@ def get_search_lens_keyboard(file_url: str, query: str):
     kb = InlineKeyboardMarkup(row_width=1)
     kb.add(
         InlineKeyboardButton("🌐 Google Lens — визуальный поиск", url=lens_url),
-        InlineKeyboardButton("🛍 Донплафон", url=f"https://donplafon.ru/search/?q={q}"),
-        InlineKeyboardButton("🛍 Империум", url=f"https://imperiumloft.ru/search/?q={q}"),
-        InlineKeyboardButton("🛍 33 идеи", url=f"https://www.33ideas.ru/search/?q={q}"),
-        InlineKeyboardButton("🛍 Алиэкспресс", url=f"https://aliexpress.ru/wholesale?SearchText={quote(query, safe='')}"),
-        InlineKeyboardButton("🔎 Google — все магазины", url=f"https://www.google.com/search?q={quote(f'купить {query} donplafon OR imperiumloft OR 33ideas', safe='')}"),
+        InlineKeyboardButton("🔎 Google — все магазины", url=f"https://www.google.com/search?q={quote(f'купить {query} Донплафон Империум 33 идеи', safe='')}"),
     )
     return kb
