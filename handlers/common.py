@@ -102,33 +102,6 @@ def back_handler(message):
     user_styles[uid] = "detailed"
     bot.send_message(message.chat.id, "Возврат в главное меню", reply_markup=get_main_keyboard())
 
-
-@bot.message_handler(func=lambda m: m.text == "👤 Мой статус")
-def status_handler(message):
-    uid = str(message.from_user.id)
-    users = load_users()
-    user_data = users.get(uid, {})
-
-    count = user_data.get("count", 0)
-    expiry_date = get_premium_expiry(uid)
-
-    if expiry_date:
-        days_left = (expiry_date - datetime.now()).days + 1
-        status_text = f"⭐ <b>Премиум</b> (осталось {max(0, days_left)} дн.)\n📅 До: <code>{expiry_date.strftime('%d.%m.%Y')}</code>"
-    else:
-        status_text = f"🆓 <b>Лимит:</b> {count}/{FREE_LIMIT}"
-
-    response = (
-        f"👤 <b>Профиль</b>\n"
-        f"━━━━━━━━━━━━━━\n"
-        f"🆔 ID: <code>{uid}</code>\n"
-        f"📊 Статус: {status_text}\n"
-        f"━━━━━━━━━━━━━━\n"
-        f"Для продления пиши: @holy_pafnuti"
-    )
-    bot.reply_to(message, response, parse_mode="HTML")
-
-
 @bot.message_handler(
     func=lambda message: (
         message.content_type == "text"
@@ -137,7 +110,6 @@ def status_handler(message):
             "📱 SMM инструменты",
             "🧠 Помощник менеджера",
             "📋 Свои хар-ки",
-            "👤 Мой статус",
             "🎨 Выбрать стиль",
             "📍 Собрать ключи",
             "🏷 Мета-теги (T/D)",
